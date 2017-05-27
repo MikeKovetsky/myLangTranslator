@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>sapr</title>
+	<link rel="stylesheet" href="bootstrap.css">
+	<style>
+		#source-code {
+			width: 100%;
+			height: 320px;
+			margin-bottom: 20px;
+
+		}
+		#default-value {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-4">
+				<h3>Analyzer</h3>
+				<textarea class="form-control" name="" id="source-code"></textarea>
+				<div>
+					<!-- <button class="button" id="analyze">analyze</button> -->
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<h3>Lexical Errors:</h3>
+				<div class="errors-container" id="lexical-errors"></div>
+			</div>
+			<div class="col-sm-4">
+				<h3>Syntax Errors:</h3>
+				<div id="syntaxErrors" class="errors-container"></div>
+			</div>
+		</div>
+		<div class="row">
+			<h3>Таблица восходящего разбора</h3>
+			<table class="table lexemes-table table-striped" id="risingTable">
+				<thead>
+					<tr>
+						<td># шага</td>
+						<td>Стек</td>
+						<td>Знак</td>
+						<td>Входящая цепь</td>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+			<pre id="default-value">
+program Mishok
+	int a, i
+begin
+	for i = 1 to -5-55 step 1 do i = i + 1
+next
+	if i == 3
+		out(i)
+		in(i)
+	else i = i + 1
+		out(i)
+	endif
+	i = 89 + 1
+end </pre>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<h3>Lexemes</h3>
+				<table class="table lexemes-table table-striped">
+					<thead>
+						<tr>
+							<td>N</td>
+							<td>N row</td>
+							<td>GrammarLexeme</td>
+							<td>lexeme code</td>
+							<td>idn/const code</td>
+						</tr>
+					</thead>
+					<tbody class="lexemes-table-body">
+						
+					</tbody>
+				</table>
+			</div>
+			<div class="col-sm-6">
+				<h3>IDNS</h3>
+				<table class="table idns-table table-striped">
+						<thead>
+						<tr>
+							<td>Code</td>
+							<td>Idn</td>
+							<td>type</td>
+						</tr>
+					</thead>
+					<tbody class="idns-table-body">
+						
+					</tbody>
+				</table>
+				<h3>Consts</h3>
+				<table class="table consts-table table-striped">
+						<thead>
+						<tr>
+							<td>Code</td>
+							<td>GrammarLexeme</td>
+						</tr>
+					</thead>
+					<tbody class="consts-table-body">
+						
+					</tbody>
+				</table>
+				<h3>MPA Lexemes</h3>
+				<table class="table mpa-table table-striped">
+					<thead>
+					<tr>
+						<td>N</td>
+						<td>GrammarLexeme</td>
+						<td>state</td>
+						<td>stack</td>
+					</tr>
+					</thead>
+					<tbody class="mpa-table-body">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="jquery.min.js"></script>
+<script src="Error.js"></script>
+<script src="syntaxAnalyzer.js"></script>
+<script src="mpa-states.js"></script>
+<script src="mpa-analyzer.js"></script>
+
+<script src="sapr4/grammarTable.js"></script>
+<script src="sapr4/Lexeme.js"></script>
+<script src="sapr4/PrecedenceRelationshipGrammar.js"></script>
+
+<script src="risingAnalyzer/RisingAnalyzer.js"></script>
+<script src="risingAnalyzer/RisingAnalyzerItem.js"></script>
+
+<script src="main.js"></script>
+<!--<script src="sapr4/main.js"></script>-->
+</html>
