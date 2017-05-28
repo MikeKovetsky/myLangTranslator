@@ -1,10 +1,13 @@
-// program Mishok
-// 	int a
-// begin
-// for i = 1 to 5 step 1 do i + 1 next
-// if i < 5
-// 	out(i)
-// else i + 1 endif
+// program Mishok int @ a, @ i
+// begin a = 0
+// for i = 1 to -5-55 step 1 do i = i + 1
+//     next
+// if i == 3 out(i)
+// in(i)
+// else i = i + 1
+// out(i)
+// endif
+// i = 89 + 1
 // end
 
 function countElementsWithValue(list, value) {
@@ -31,7 +34,7 @@ var wasDivided = false;
 var machineState = 1;
 var needsReanalize = false;
 var currentLineNumber = 1;
-var langLexemesNames = ['program', 'begin', 'end', 'int', 'for', 'to', 'step',
+var langLexemesNames = ['program', '@', 'begin', 'end', 'int', 'for', 'to', 'step',
     'do', 'next', 'in', 'out', 'if', 'else', 'endif', ',', '=', '+', '-',
     '*', '/', '(', ')', '>', '<', '&&', '==', '!=', '<=', '>=', '||', '↑', 'idn', 'con', 'П', '!'];
 var dataTypes = ['int', 'program'];
@@ -53,10 +56,10 @@ for (var i = 0; i < langLexemesNames.length; i++) {
 var Symbol = function (symbolText) {
     this.text = symbolText;
     this.isLetter = function () {
-        return this.text >= 'A' && this.text <= 'z';
+        return this.text >= 'A' && this.text <= 'z' || this.text === '@';
     };
     this.isNumber = function () {
-        return parseInt(this.text);
+        return !isNaN(this.text);
     };
     this.isOneSymbolDelimeter = function () {
         var delimiters = [',', '*', '/', '↑', ' ', '\t', '\n', 'П'];
@@ -90,7 +93,8 @@ function showError(symbol, msg) {
     if (!symbol) symbol = '';
     if (!msg) msg = '';
     var errorInfo = 'Error on line ' + currentLineNumber + '. Symbol: ' + symbol + '. ' + msg;
-    $('#lexical-errors').append(errorInfo + '<br>')
+    console.log(errorInfo, symbol);
+    $('#lexical-errors').append(errorInfo + '<br>');
     wasLexError = true;
     throw Error(errorInfo);
 }
@@ -499,9 +503,9 @@ function analyze(sourceCode) {
     printLexemes(lexemes);
     printConsts(lexemes);
     printIdns(lexemes);
-    var syntaxAnalyzer = new SyntaxAnalyzer(lexemes);
-    syntaxAnalyzer.analyze();
-    printSyntaxErrors(syntaxAnalyzer.errors);
+    // var syntaxAnalyzer = new SyntaxAnalyzer(lexemes);
+    // syntaxAnalyzer.analyze();
+    // printSyntaxErrors(syntaxAnalyzer.errors);
     // var mpa = new MpaAnalyzer(lexemes, langLexemes);
     // mpa.analyze();
     // printMpaLexemes(mpa);
