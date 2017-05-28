@@ -3,7 +3,15 @@ class PrecedenceRelationshipGrammar {
         this.sourceCode = sourceCode;
         this.rightRules = this.sourceCode
             .split('\n')
-            .map((line) => line.split('::=')[1]);
+            .map((line) => line.split('::=')[1])
+            .map((rule) => {
+                return rule
+                    .split('|')
+                    .map((subRule) => subRule
+                        .split(' ')
+                        .filter(el => !!el)
+                    );
+            });
         this.nonterminalNames =
             this.sourceCode
                 .split('\n')
@@ -25,16 +33,8 @@ class PrecedenceRelationshipGrammar {
     }
 
     setEquality() {
-        let rules = this.rightRules.map(function (rule) {
-            return rule
-                .split('|')
-                .map((subRule) => subRule
-                    .split(' ')
-                    .filter(el => !!el)
-                );
-        });
         this.lexemes.forEach(
-            lexeme => rules.forEach(
+            lexeme => this.rightRules.forEach(
                 rule => rule.forEach(
                     subRule => {
                         let prevValue = '';
@@ -123,7 +123,7 @@ class PrecedenceRelationshipGrammar {
                 this.lexemes[lineNumber].firstPluses =
                     this.findFirstPluses(line, [], lineNumber);
             });
-    }   
+    }
 
     findAllLastPluses() {
         let lines = this.sourceCode.split('\n');
@@ -204,5 +204,17 @@ class PrecedenceRelationshipGrammar {
         )
     }
 
+    raiseLexeme(lexeme) {
+        const rules = this.rightRules.clone().reverse();
+        for (let i = 0; i < rules.length; i++) {
+            const rule = rules[i];
+            for (let j = 0; j < rule.length; j++) {
+                const subRule = rule[j];
+                if (subRule.includes(lexeme.label)) {
+                    return this.nonterminalNames.clone().reverse()[i];
+                }
+            }
+        }
+    }
 
 }

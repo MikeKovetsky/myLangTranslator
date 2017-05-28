@@ -513,6 +513,7 @@ function analyze(sourceCode) {
     grammar.setLess();
     grammar.setMore1();
     grammar.setMore2();
+    console.log(grammar);
 
     Array.prototype.last = function() {
         return this[this.length-1];
