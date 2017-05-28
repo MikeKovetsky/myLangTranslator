@@ -204,13 +204,15 @@ class PrecedenceRelationshipGrammar {
         )
     }
 
-    raiseLexeme(lexeme) {
+    raiseLexemes(lexemes) {
         const rules = this.rightRules.clone().reverse();
         for (let i = 0; i < rules.length; i++) {
             const rule = rules[i];
-            for (let j = 0; j < rule.length; j++) {
-                const subRule = rule[j];
-                if (subRule.includes(lexeme.label)) {
+            for (let subRule of rule) {
+                const belongsToSubRule = function (lexeme) {
+                    return subRule.includes(lexeme.label)
+                };
+                if (lexemes.every(belongsToSubRule)) {
                     return this.nonterminalNames.clone().reverse()[i];
                 }
             }
