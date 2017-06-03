@@ -503,21 +503,28 @@ function analyze(sourceCode) {
     printLexemes(lexemes);
     printConsts(lexemes);
     printIdns(lexemes);
-    // var syntaxAnalyzer = new SyntaxAnalyzer(lexemes);
-    // syntaxAnalyzer.analyze();
-    // printSyntaxErrors(syntaxAnalyzer.errors);
+    var syntaxAnalyzer = new SyntaxAnalyzer(lexemes);
+    syntaxAnalyzer.analyze();
+    printSyntaxErrors(syntaxAnalyzer.errors);
+
+    // 6 laba
+
+    const polizBuilder = new PolizBuilder();
+    polizBuilder.build();
+    console.log(polizBuilder.Poliz);
+
     // var mpa = new MpaAnalyzer(lexemes, langLexemes);
     // mpa.analyze();
     // printMpaLexemes(mpa);
 
-    let grammar = new PrecedenceRelationshipGrammar(sourceGrammar);
-    grammar.setEquality();
-    grammar.findAllFirstPluses();
-    grammar.findAllLastPluses();
-    grammar.setLess();
-    grammar.setMore1();
-    grammar.setMore2();
-    console.log(grammar);
+    // let grammar = new PrecedenceRelationshipGrammar(sourceGrammar);
+    // grammar.setEquality();
+    // grammar.findAllFirstPluses();
+    // grammar.findAllLastPluses();
+    // grammar.setLess();
+    // grammar.setMore1();
+    // grammar.setMore2();
+    // console.log(grammar);
 
     Array.prototype.last = function() {
         return this[this.length-1];
@@ -526,19 +533,19 @@ function analyze(sourceCode) {
         return this.slice(0);
     };
 
-    let risingAnalyzer = new RisingAnalyzer(grammar, lexemes);
-    let risingAnalyzerTable = risingAnalyzer.analyze();
-    console.log(risingAnalyzerTable);
-
-    risingAnalyzerTable.forEach((row, index) => {
-        $('#risingTable tbody').append(
-            `<tr>
-                <td>${index + 1}</td>
-                <td>${row.getStack()}</td>
-                <td>${row.relationSign}</td>
-                <td>${row.getChain()}</td>
-            </tr>`)
-    });
+    // let risingAnalyzer = new RisingAnalyzer(grammar, lexemes);
+    // let risingAnalyzerTable = risingAnalyzer.analyze();
+    // console.log(risingAnalyzerTable);
+    //
+    // risingAnalyzerTable.forEach((row, index) => {
+    //     $('#risingTable tbody').append(
+    //         `<tr>
+    //             <td>${index + 1}</td>
+    //             <td>${row.getStack()}</td>
+    //             <td>${row.relationSign}</td>
+    //             <td>${row.getChain()}</td>
+    //         </tr>`)
+    // });
 }
 
 $('#source-code').change(function () {
