@@ -34,7 +34,7 @@ var wasDivided = false;
 var machineState = 1;
 var needsReanalize = false;
 var currentLineNumber = 1;
-var langLexemesNames = ['program', '@', 'begin', 'end', 'int', 'for', 'to', 'step',
+var langLexemesNames = ['program', 'begin', 'end', 'int', 'for', 'to', 'step',
     'do', 'next', 'in', 'out', 'if', 'else', 'endif', ',', '=', '+', '-',
     '*', '/', '(', ')', '>', '<', '&&', '==', '!=', '<=', '>=', '||', '↑', 'idn', 'con', 'П', '!'];
 var dataTypes = ['int', 'program'];
@@ -508,11 +508,23 @@ function analyze(sourceCode) {
     printSyntaxErrors(syntaxAnalyzer.errors);
 
     // 6 laba
+    const lexemeChain = lexemes.map((lexeme) => {
+        let type = '';
+        switch (lexeme.lexemeCode) {
+            case 32: type = 'idn'; break;
+            case 33: type = 'con'; break;
+            default: type = 'operation'; break;
+        }
+        return new WorkItem(lexeme.lexemeName, type);
+    });
 
-    const polizBuilder = new PolizBuilder();
+    const polizBuilder = new PolizBuilder(lexemeChain);
     polizBuilder.build();
-    console.log(polizBuilder.Poliz);
-
+    console.log(polizBuilder.poliz);
+    $('#poliz').empty();
+    polizBuilder.poliz.forEach(item => {
+        $('#poliz').append(item.token + ' ');
+    });
     // var mpa = new MpaAnalyzer(lexemes, langLexemes);
     // mpa.analyze();
     // printMpaLexemes(mpa);

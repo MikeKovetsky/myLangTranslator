@@ -46,14 +46,14 @@ function SyntaxAnalyzer(lexemes) {
                 if (checkLexeme(34, 'отступ')) { //П
                     if (declarationList()) {
                         if (checkLexeme(2, 'отсутствует begin у списка операторов')) { //begin
-                            if (checkLexeme(34, 'отступ после')) {
+                            // if (checkLexeme(34, 'отступ после')) {
                                 if (operatorsList()) {
                                     if (checkLexeme(3, 'отсутсвует end в конце списка операторов')) { //end
                                         console.log('Нет ошибок');
                                         return true;
                                     }
                                 }
-                            }
+                            // }
                         }
                     }
                 }

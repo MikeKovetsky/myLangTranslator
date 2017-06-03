@@ -27,6 +27,10 @@
 				</div>
 			</div>
 			<div class="col-sm-4">
+				<h3>Poliz:</h3>
+				<div id="poliz"></div>
+			</div>
+			<div class="col-sm-4">
 				<h3>Lexical Errors:</h3>
 				<div class="errors-container" id="lexical-errors"></div>
 			</div>
@@ -51,18 +55,32 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-6">
-			<pre id="default-value">
-program Mishok int @ a, @ i
-begin a = 0
+			<!--<pre id="default-value">-->
+<!--program Mishok int @ a, @ i-->
+<!--begin a = 0-->
+	<!--for i = 1 to -5-55 step 1 do i = i + 1-->
+<!--next-->
+	<!--if i == 3 out(i)-->
+		<!--in(i)-->
+	<!--else i = i + 1-->
+		<!--out(i)-->
+	<!--endif-->
+	<!--i = 89 + 1-->
+<!--end <pre>-->
+				<pre id="default-value">
+program Mishok
+	int a, i
+begin i = 2 + 3
 	for i = 1 to -5-55 step 1 do i = i + 1
 next
-	if i == 3 out(i)
-		in(i)
+	if i == 3
+		a = 2
 	else i = i + 1
-		out(i)
+		a = 9
 	endif
 	i = 89 + 1
-end  </pre>
+end
+				</pre>
 			</div>
 		</div>
 		<div class="row">
@@ -140,9 +158,8 @@ end  </pre>
 <script src="sapr5/PolizBuilder.js"></script>
 <script src="sapr5/PolizCell.js"></script>
 <script src="sapr5/PolizLabel.js"></script>
-<script src="sapr5/PriorityTable.js"></script>
+<script src="sapr5/Priority.js"></script>
 <script src="sapr5/WorkItem.js"></script>
-<script src="sapr5/Table_7.js"></script>
 
 <script src="risingAnalyzer/RisingAnalyzer.js"></script>
 <script src="risingAnalyzer/RisingAnalyzerItem.js"></script>
