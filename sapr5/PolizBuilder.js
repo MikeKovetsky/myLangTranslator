@@ -154,16 +154,33 @@ class PolizBuilder  {
                     //     this.inputLexemes.splice(0,1);
                     //     continue;
                     // }
-                    else if (this.inputLexemes[0].token === "(") {
+                        else if (this.inputLexemes[0].token === "out" || this.inputLexemes[0].token === "in"){
                         this.stack.push(this.inputLexemes[0]);
                         this.inputLexemes.splice(0,1);
                         continue;
                     }
+                    else if (this.inputLexemes[0].token === "(") {
+                        if (this.stack.last().token === "out" || this.stack.last().token === "in"){
+                            this.inputLexemes.splice(0,1);
+                            continue;
+                        } else {
+                            this.stack.push(this.inputLexemes[0]);
+                            this.inputLexemes.splice(0,1);
+                            continue;
+                        }
+                    }
+                    else if (this.inputLexemes[0].token === ","){
+                            if (this.stack.last().token === "out"){
+                                this.poliz.push(new WorkItem("RD", "operation"));
+                            } else if (this.stack.last().token === "in"){
+                                this.poliz.push(new WorkItem("WR", "operation"));
+                            }
+                    }
                     else if (this.inputLexemes[0].token === "next") {
                         while (this.stack.last().token !== "for") {
-                            // if (this.stack.last().token !== "cout" || this.stack.last().token !== "cin")
-                            //     this.poliz.push(this.stack.pop());
-                            // else
+                            if (this.stack.last().token !== "out" || this.stack.last().token !== "in")
+                                 this.poliz.push(this.stack.pop());
+                             else
                                 this.stack.pop();
                         }
                         this.stack.pop();
@@ -190,16 +207,16 @@ class PolizBuilder  {
                             break;
                         if (this.loopEnd > 0 && this.stack.last().token === "for")
                             break;
-                        // if (this.stack.last().token === "cout" || this.stack.last().token === "cin")
-                        //     if (this.inputLexemes[0].token === "<<" || this.inputLexemes[0].token === ">>") {
-                        //         break;
-                        //     }
-                        //     else if (this.inputLexemes[0].token === "П") {
-                        //         this.stack.pop();
-                        //         if (this.stack.length > 0)
-                        //             priority1 = this.getPriority(this.stack.last().token);
-                        //         break;
-                        //     }
+                        if (this.stack.last().token === "out" || this.stack.last().token === "in")
+                            if (this.inputLexemes[0].token === ",") {
+                                break;
+                            }
+                            else if (this.inputLexemes[0].token === "П") {
+                                this.stack.pop();
+                                if (this.stack.length > 0)
+                                    priority1 = this.getPriority(this.stack.last().token);
+                                break;
+                            }
                         if (this.stack.last().token === "if") {
                             break;
                         } else {
@@ -225,8 +242,13 @@ class PolizBuilder  {
                         continue;
                     }
                     else if (this.inputLexemes[0].token === ")") {
-                        while (!(this.stack.last().token === "(")) {
+                        while (!(this.stack.last().token === "out" || this.stack.last().token === "in")) {
                             this.poliz.push(this.stack.pop());
+                        }
+                        if (this.stack.last().token === "out"){
+                            this.poliz.push(new WorkItem("RD", "operation"));
+                        } else if (this.stack.last().token === "in") {
+                            this.poliz.push(new WorkItem("WR", "operation"));
                         }
                         this.inputLexemes.splice(0,1);
                         this.stack.pop();
