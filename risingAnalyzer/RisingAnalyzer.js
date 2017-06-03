@@ -37,6 +37,19 @@ class RisingAnalyzer {
         }
     }
 
+    renderTable(items) {
+        $('#risingTable tbody').empty();
+        items.forEach((row, index) => {
+            $('#risingTable tbody').append(
+                `<tr>
+                <td>${index + 1}</td>
+                <td>${row.getStack()}</td>
+                <td>${row.relationSign}</td>
+                <td>${row.getChain()}</td>
+            </tr>`)
+        });
+    }
+
     analyze() {
         const hash = new GrammarLexeme('#');
         let sourceChain = this.sourceLexemes.clone();
@@ -47,27 +60,37 @@ class RisingAnalyzer {
         this.precedenceRelationships.lexemes.unshift(hash);
         let stack = [hash];
         let items = [];
-        this.sourceLexemes.forEach((lexeme) => {
+        this.sourceLexemes.forEach((lexeme, index) => {
             const grammarItem = this.findGrammarItem(lexeme);
-            const relationSign = this.getSignBetween(stack.last(), grammarItem);
+            let relationSign = this.getSignBetween(stack.last(), grammarItem);
+            // if (grammarItem.label === 'begin' && !relationSign) {
+            //     stack.last().moreThan.push('begin');
+            //     relationSign = this.getSignBetween(stack.last(), grammarItem);
+            // }
+            // if (index === 13) {
+            //     stack.last().moreThan.push('П');
+            //     relationSign = this.getSignBetween(stack.last(), grammarItem);
+            // }
             items.push(new RisingAnalyzerItem(stack, relationSign, sourceChain));
             if (relationSign === '<' || relationSign === '=') {
                 stack.push(this.findGrammarItem(sourceChain.shift()));
             }
             if (relationSign === '>') {
-                const reversedStack = stack.clone().reverse();
-                for (let [index, stackEl] of reversedStack.entries()) {
+                for (let stackEl of stack.clone().reverse()) {
+                    const reversedStack = stack.clone().reverse();
+                    const index = reversedStack.indexOf(stackEl);
                     if (index > 0) {
                         const prevStackEl = reversedStack[index - 1];
                         const sign = this.getSignBetween(stackEl, prevStackEl);
                         if (sign === '<' || sign === '=') {
                             const base = this.findBase(reversedStack);
-                            const raisedLexemeName = this.precedenceRelationships.raiseLexemes(base);
+                            const raisedLexemeName = this.precedenceRelationships.raiseLexemes(base.reverse());
                             const raisedLexeme = this.precedenceRelationships.lexemes.find(precedenceLexeme => {
                                 return raisedLexemeName === precedenceLexeme.label;
                             });
                             const sign = this.getSignBetween(raisedLexeme, grammarItem);
-                            stack[stack.length - 1] = raisedLexeme;
+                            stack = stack.slice(0, -base.length);
+                            stack.push(raisedLexeme);
                             items.push(new RisingAnalyzerItem(stack, sign, sourceChain));
                             if (sign === '<' || sign === '=') {
                                 stack.push(this.findGrammarItem(sourceChain.shift()));
@@ -77,6 +100,7 @@ class RisingAnalyzer {
                     }
                 }
             }
+            this.renderTable(items);
         });
         return items;
     }

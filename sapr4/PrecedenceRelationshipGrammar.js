@@ -72,12 +72,11 @@ class PrecedenceRelationshipGrammar {
                 firstPlus !== this.nonterminalNames[lineNumber]) {
                 let lines = this.sourceCode.split('\n');
                 lines.forEach((line, newLineNumber) => {
-                        if (this.nonterminalNames[newLineNumber] === firstPlus
-                            && this.nonterminalNames[lineNumber] !== firstPlus
-                            && newLineNumber > lineNumber)
-                            firstPluses = this.findFirstPluses(line, firstPluses, newLineNumber)
-                    }
-                )
+                    if (this.nonterminalNames[newLineNumber] === firstPlus &&
+                        this.nonterminalNames[lineNumber] !== firstPlus &&
+                        newLineNumber > lineNumber)
+                        firstPluses = this.findFirstPluses(line, firstPluses, newLineNumber)
+                })
             }
         });
         return firstPluses;
@@ -105,9 +104,9 @@ class PrecedenceRelationshipGrammar {
                 lastPlus !== this.nonterminalNames[lineNumber]) {
                 let lines = this.sourceCode.split('\n');
                 lines.forEach((line, newLineNumber) => {
-                        if (this.nonterminalNames[newLineNumber] === lastPlus
-                            && this.nonterminalNames[lineNumber] !== lastPlus
-                            && newLineNumber > lineNumber)
+                        if (this.nonterminalNames[newLineNumber] === lastPlus &&
+                            this.nonterminalNames[lineNumber] !== lastPlus &&
+                            newLineNumber > lineNumber)
                             lastPluses = this.findFirstPluses(line, lastPluses, newLineNumber)
                     }
                 )
@@ -118,90 +117,85 @@ class PrecedenceRelationshipGrammar {
 
     findAllFirstPluses() {
         let lines = this.sourceCode.split('\n');
-        lines.forEach(
-            (line, lineNumber) => {
-                this.lexemes[lineNumber].firstPluses =
-                    this.findFirstPluses(line, [], lineNumber);
-            });
+        lines.forEach((line, lineNumber) => {
+            this.lexemes[lineNumber].firstPluses =
+                this.findFirstPluses(line, [], lineNumber);
+        });
     }
 
     findAllLastPluses() {
         let lines = this.sourceCode.split('\n');
-        lines.forEach(
-            (line, lineNumber) => {
-                this.lexemes[lineNumber].lastPluses =
-                    this.findLastPluses(line, [], lineNumber);
-            });
+        lines.forEach((line, lineNumber) => {
+            this.lexemes[lineNumber].lastPluses =
+                this.findLastPluses(line, [], lineNumber);
+        });
     }
 
     setLess() {
-        this.lexemes.forEach(
-            (lexemeR, index) =>
-                lexemeR.equalsTo.forEach(
-                    (lexemeV) => {
-                        let lexemeVObj = this.lexemes.filter(
-                            lexeme => lexeme.label === lexemeV
-                        );
-                        if (lexemeVObj[0] && lexemeVObj[0].isTerminal) return;
-                        lexemeVObj[0].firstPluses.forEach(firstPlus => {
-                            let firstPlusObj = this.lexemes.filter(
-                                lexeme => lexeme.label === firstPlus
-                            );
-                            if (firstPlusObj[0]) {
-                                this.lexemes[index].lessThan.push(firstPlusObj[0].label);
-                            }
-                        });
+        this.lexemes.forEach((lexemeR, index) =>
+            lexemeR.equalsTo.forEach((lexemeV) => {
+                let lexemeVObj = this.lexemes.find(
+                    lexeme => lexeme.label === lexemeV
+                );
+                if (lexemeVObj && lexemeVObj.isTerminal) return;
+                lexemeVObj.firstPluses.forEach(firstPlus => {
+                    let firstPlusObj = this.lexemes.find(
+                        lexeme => lexeme.label === firstPlus
+                    );
+                    if (firstPlusObj) {
+                        this.lexemes[index].lessThan.push(firstPlusObj.label);
                     }
-                )
+                });
+            })
         )
     }
 
     setMore1() {
         this.lexemes.forEach(
-            (lexemeR) =>
+            (lexemeR) => {
+                // if (lexemeR.label === 'begin') debugger;
                 lexemeR.equalsTo.forEach(
                     (lexemeV) => {
                         if (lexemeR.isTerminal) return;
                         lexemeR.lastPluses.forEach(lastPlus => {
-                            let lastPlusObj = this.lexemes.filter(
+                            let lastPlusObj = this.lexemes.find(
                                 lexeme => lexeme.label === lastPlus
                             );
-                            if (lastPlusObj[0]) {
-                                lastPlusObj[0].moreThan.push(lexemeV);
+                            if (lastPlusObj) {
+                                lastPlusObj.moreThan.push(lexemeV);
                             }
                         })
                     }
                 )
-        )
+            })
     }
 
     setMore2() {
         this.lexemes.forEach(
-            (lexemeR, index) =>
+            (lexemeR, index) => {
+                // if (lexemeR.label === 'begin') debugger;
                 lexemeR.equalsTo.forEach(
                     (lexemeV) => {
-                        let lexemeVObj = this.lexemes.filter(
+                        let lexemeVObj = this.lexemes.find(
                             lexeme => lexeme.label === lexemeV
                         );
-                        if (lexemeVObj[0] && lexemeVObj[0].isTerminal) return;
-                        if (lexemeR.isTerminal) return;
+                        if (lexemeVObj && lexemeVObj.isTerminal || lexemeR.isTerminal) return;
                         lexemeR.lastPluses.forEach(lastPlus => {
-                            let lastPlusObj = this.lexemes.filter(
+                            let lastPlusObj = this.lexemes.find(
                                 lexeme => lexeme.label === lastPlus
                             );
-                            lexemeVObj[0].firstPluses.forEach(
-                                firstPlus => {
-                                    let firstPlusObj = this.lexemes.filter(
-                                        lexeme => lexeme.label === firstPlus
-                                    );
-                                    if (lastPlusObj[0] && firstPlusObj[0]) {
-                                        lastPlusObj[0].moreThan.push(firstPlusObj[0].label);
-                                    }
-                                });
+                            lexemeVObj.firstPluses.forEach(firstPlus => {
+                                let firstPlusObj = this.lexemes.find(
+                                    lexeme => lexeme.label === firstPlus
+                                );
+                                if (lastPlusObj && firstPlusObj) {
+                                    lastPlusObj.moreThan.push(firstPlusObj.label);
+                                }
+                            });
                         })
                     }
                 )
-        )
+            })
     }
 
     raiseLexemes(lexemes) {
@@ -209,11 +203,13 @@ class PrecedenceRelationshipGrammar {
         for (let i = 0; i < rules.length; i++) {
             const rule = rules[i];
             for (let subRule of rule) {
-                const belongsToSubRule = function (lexeme) {
-                    return subRule.includes(lexeme.label)
-                };
-                if (lexemes.every(belongsToSubRule)) {
-                    return this.nonterminalNames.clone().reverse()[i];
+                if (subRule.length === lexemes.length) {
+                    const found = subRule.every((subRuleLexeme, index) => {
+                        return lexemes[index] && subRuleLexeme === lexemes[index].label
+                    });
+                    if (found) {
+                        return this.nonterminalNames.clone().reverse()[i];
+                    }
                 }
             }
         }
