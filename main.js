@@ -36,7 +36,7 @@ var needsReanalize = false;
 var currentLineNumber = 1;
 var langLexemesNames = ['program', 'begin', 'end', 'int', 'for', 'to', 'step',
     'do', 'next', 'in', 'out', 'if', 'else', 'endif', ',', '=', '+', '-',
-    '*', '/', '(', ')', '>', '<', '&&', '==', '!=', '<=', '>=', '||', '↑', 'idn', 'con', 'П', '!'];
+    '*', '/', '(', ')', '>', '<', '&&', '==', '!=', '<=', '>=', '||', '^', 'idn', 'con', 'П', '!'];
 var dataTypes = ['int', 'program'];
 var lexemeEnd = false;
 var definedIdns = [];
@@ -62,7 +62,7 @@ var Symbol = function (symbolText) {
         return !isNaN(this.text);
     };
     this.isOneSymbolDelimeter = function () {
-        var delimiters = [',', '*', '/', '↑', ' ', '\t', '\n', 'П'];
+        var delimiters = [',', '*', '/', '^', ' ', '\t', '\n', 'П'];
         return (delimiters.indexOf(this.text) !== -1);
     };
     this.isPositiveNumber = function () {
@@ -529,14 +529,15 @@ function analyze(sourceCode) {
 
     console.log(idns);
     const polizExecutor = new PolizExecutor(
-        poliz.chain, poliz.polizLabels, poliz.polizCells, idns);
+        poliz.chain, poliz.polizLabels, poliz.polizCells, idns
+    );
 
     let executionResults = polizExecutor.execute();
     console.log(executionResults);
-    // $('#poliz').empty();
-    // poliz.forEach(item => {
-    //     $('#poliz').append(item.token + ' ');
-    // });
+    $('#console').empty();
+    polizExecutor._OutParam.forEach(item => {
+        $('#console').append(item.token + ' ', item.value);
+    });
 
     // var mpa = new MpaAnalyzer(lexemes, langLexemes);
     // mpa.analyze();

@@ -6,7 +6,7 @@ class PolizExecutor {
         this._Status = "";
         this._Position = 0;
         this._Stack = [];
-        this._OutParam = {};
+        this._OutParam = [];
         this._IdentifyTable = [];
         for (let row of identifyTable) {
             this._IdentifyTable.push(new Identifier(row.lexemeName, row.dataType, null));
@@ -15,7 +15,6 @@ class PolizExecutor {
 
     execute() {
         let idnInputs = [];
-        let consoleOutput = [];
         while (this._Status !== "Successful Done") {
             while (this._Status === "") {
                 this.GoNextStep();
@@ -25,12 +24,12 @@ class PolizExecutor {
             }
             else if (this._Status.indexOf("Output") !== -1) {
                 let ind = this._IdentifyTable.find(o => o.token === this._Stack.last().token);
-                consoleOutput.push(new Identifier(this._Stack.last().token, "int", ind.value));
+                // this._OutParam.push(new Identifier(this._Stack.last().token, "int", ind.value));
                 this._Status = "";
                 this._Position++;
             }
         }
-        return {idnInputs, consoleOutput};
+        return {idnInputs};
     }
 
     GoNextStep() {
@@ -55,7 +54,7 @@ class PolizExecutor {
         }
         else if (this._Poliz[this._Position].type === "operation")
         {
-            if (this._Poliz[this._Position].token === ">>")
+            if (this._Poliz[this._Position].token === "RD")
             {
                 this._Status = "Input ";
                 if (this._Stack.length > 0)
@@ -67,7 +66,7 @@ class PolizExecutor {
                     }
                 }
             }
-            else if (this._Poliz[this._Position].token === "<<")
+            else if (this._Poliz[this._Position].token === "WR")
             {
                 this._Status = "Output ";
                 if (this._Stack.length > 0)
@@ -76,7 +75,7 @@ class PolizExecutor {
                     let obj = this._IdentifyTable.find(o => o.token === idn);
                     if (obj) {
                         this._Status += obj.type;
-                        this._OutParam = obj.value;
+                        this._OutParam.push({token: obj.token + ':', value: obj.value});
                         return;
                     }
                     return;
@@ -112,14 +111,6 @@ class PolizExecutor {
                 else
                     console.error('Invalid operation');
             }
-            // else if (this._Poliz[this._Position].token === "@")
-            // {
-            //     let item1 = this._Stack.pop();
-            //     let val1 = this.GetItemValue(item1);
-            //     let res = -val1;
-            //     this._Stack.push(new PolizItem(res.toString(), "con"));
-            //     this._Position++;
-            // }
             else if (this._Poliz[this._Position].token === ">" ||
                 this._Poliz[this._Position].token === "<" ||
                 this._Poliz[this._Position].token === "<=" ||
@@ -164,14 +155,14 @@ class PolizExecutor {
                     if (obj.type === "int") {
                         let res = parseInt(val);
                         obj.value = res;
+                        console.log(obj.token, res);
                     }
                     else
                         console.error('Invalid Operation');
                 }
                 else if (item2.type === "cell") {
                     ob = this._PolizCells.find(o => o.cell === item2.token);
-                    let res = parseInt(val);
-                    ob.position = res;
+                    ob.value = parseInt(val);
                 }
                 this._Position++;
             }
@@ -180,7 +171,7 @@ class PolizExecutor {
                 let item1 = this._Stack.pop();
                 let item2 = this._Stack.pop();
 
-                if (item2.token === "False") {
+                if (item2.token === "false") {
                     let obj = this._PolizLabels.find(o => o.label === item1.token);
                     this._Position = obj.position;
                 }
@@ -195,10 +186,10 @@ class PolizExecutor {
             else if (this._Poliz[this._Position].token === "and") {
                 let item1 = this._Stack.pop();
                 let item2 = this._Stack.pop();
-                if (item1.token === "True" && item2.token === "True")
-                    this._Stack.push(new PolizItem("True", "con"));
+                if (item1.token === "true" && item2.token === "true")
+                    this._Stack.push(new PolizItem("true", "con"));
                 else
-                    this._Stack.push(new PolizItem("False", "con"));
+                    this._Stack.push(new PolizItem("false", "con"));
 
                 this._Position++;
             }
@@ -206,19 +197,19 @@ class PolizExecutor {
             {
                 let item1 = this._Stack.pop();
                 let item2 = this._Stack.pop();
-                if (item1.token === "True" || item2.token === "True")
-                    this._Stack.push(new PolizItem("True", "con"));
+                if (item1.token === "true" || item2.token === "true")
+                    this._Stack.push(new PolizItem("true", "con"));
                 else
-                    this._Stack.push(new PolizItem("False", "con"));
+                    this._Stack.push(new PolizItem("false", "con"));
                 this._Position++;
             }
             else if (this._Poliz[this._Position].token === "not")
             {
                 let item1 = this._Stack.pop();
-                if (item1.token === "True")
-                    this._Stack.push(new PolizItem("False", "con"));
-                else if (item1.token === "False")
-                    this._Stack.push(new PolizItem("True", "con"));
+                if (item1.token === "true")
+                    this._Stack.push(new PolizItem("false", "con"));
+                else if (item1.token === "false")
+                    this._Stack.push(new PolizItem("true", "con"));
                 else
                     console.error("Not can be used with logical value");
                 this._Position++;
@@ -246,7 +237,7 @@ class PolizExecutor {
     GetItemValue(item) {
         let result = 0;
         if (item.type === "con") {
-            return parseFloat(result);
+            return parseInt(item.token);
         } else if (item.type === "idn") {
             let idn = this._IdentifyTable.find(o => o.token === item.token);
             if (idn.type === "int")
@@ -255,14 +246,10 @@ class PolizExecutor {
             else console.error('invalid Argument');
         }
         else if (item.type === "cell") {
-                let cell = this._PolizCells.find(o => o.cell === item.token);
-                result = parseInt(cell.position);
-                console.log(result);
-            // }
-            // for (let cell of this._PolizCells){
-            //     if (cell.cell === item.token)
-            //         result = cell.value;
-            // }
+            for (let cell of this._PolizCells){
+                if (cell.cell === item.token)
+                    result = cell.value;
+            }
         }
         else console.error('invalid Argument');
         return result;

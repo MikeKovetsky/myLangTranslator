@@ -12,7 +12,7 @@ var currentLineNumber = 1;
 var currentLexemeCode = 1;
 var langLexemes = ['program','begin','end','int','for','to','step',
 	'do','next','in','out','if','else','endif',',','=','+','-',
-	'*','/','(',')','>','<','&&','==','!=','<=','>=','idn','con','↑', 'П', '!'];
+	'*','/','(',')','>','<','&&','==','!=','<=','>=','idn','con','^', 'П', '!'];
 
 var Lexeme = function(lexemeName) { 
 	this.lexemeName = lexemeName; 
@@ -34,7 +34,7 @@ function isLetter(symbol) {
 	else return false; 
 } 
 function isOneSymbolDelimetr(symbol) {
-	var delimiters = ['(', ')', ',', '|', '*', '/', '↑'];
+	var delimiters = ['(', ')', ',', '|', '*', '/', '^'];
 	if (delimiters.indexOf(symbol) !== -1) {
 		return true;
 	}
@@ -57,7 +57,7 @@ function showError(symbol) {
 	$('.errors-container').append('Error on line ' + currentLineNumber + ' symbol:'+symbol+'<br>');
 }
 function isLexemEnd(symbol) {
-	var delimiters = [' ', ',', '\t', '\n', '(',')','|','*','/', '↑'];
+	var delimiters = [' ', ',', '\t', '\n', '(',')','|','*','/', '^'];
 	if (delimiters.indexOf(symbol) !== -1) {
 		if (symbol === '\n') {
 			currentLineNumber++;
