@@ -45,17 +45,20 @@
 				<pre id="default-value">
 program Mishok
 	int a, i
-begin i = 2 + 3
-	for i = 1 to -5-55 step 1 do i = i + 1
+begin a = 2 + 3
+	for i = 1 to 3 step 1 do a = a + 1
 next
-	if i == 3
-		a = 2
-	else i = i + 1
-		a = 9
-	endif
 	i = 89 + 1
 end
 				</pre>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<h3>Inputs</h3>
+			</div>
+			<div class="col-sm-6">
+				<h3>Console</h3>
 			</div>
 		</div>
 		<div class="row">
@@ -117,11 +120,14 @@ end
 <script src="sapr4/Lexeme.js"></script>
 <script src="sapr4/PrecedenceRelationshipGrammar.js"></script>
 
-<script src="sapr5/PolizBuilder.js"></script>
-<script src="sapr5/PolizCell.js"></script>
-<script src="sapr5/PolizLabel.js"></script>
-<script src="sapr5/Priority.js"></script>
-<script src="sapr5/WorkItem.js"></script>
+<script src="polizBuilder/PolizBuilder.js"></script>
+<script src="polizBuilder/PolizCell.js"></script>
+<script src="polizBuilder/PolizLabel.js"></script>
+<script src="polizBuilder/Priority.js"></script>
+<script src="polizBuilder/WorkItem.js"></script>
+
+<script src="polizExecutor/Identifier.js"></script>
+<script src="polizExecutor/Executor.js"></script>
 
 <script src="risingAnalyzer/RisingAnalyzer.js"></script>
 <script src="risingAnalyzer/RisingAnalyzerItem.js"></script>

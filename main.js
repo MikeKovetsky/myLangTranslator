@@ -521,11 +521,23 @@ function analyze(sourceCode) {
 
     const polizBuilder = new PolizBuilder();
     const poliz = polizBuilder.build(lexemeChain);
-    console.log(poliz);
+    console.log(poliz.chain);
     $('#poliz').empty();
-    poliz.forEach(item => {
+    poliz.chain.forEach(item => {
         $('#poliz').append(item.token + ' ');
     });
+
+    console.log(idns);
+    const polizExecutor = new PolizExecutor(
+        poliz.chain, poliz.polizLabels, poliz.polizCells, idns);
+
+    let executionResults = polizExecutor.execute();
+    console.log(executionResults);
+    // $('#poliz').empty();
+    // poliz.forEach(item => {
+    //     $('#poliz').append(item.token + ' ');
+    // });
+
     // var mpa = new MpaAnalyzer(lexemes, langLexemes);
     // mpa.analyze();
     // printMpaLexemes(mpa);

@@ -62,19 +62,20 @@ class PolizBuilder  {
             }
             switch (inputLexemes[0].token) {
                 case "for":
-                    const labels = [1,2,3].map((number) => {
-                        const label = "m" + (polizLabels.length + number);
-                        polizLabels.push(new PolizLabel(label, polizLabels.length + 1));
-                        return label;
-                    });
-                    stack.push(new PolizItem(labels[2], "label"));
-                    stack.push(new PolizItem(labels[1], "label"));
-                    stack.push(new PolizItem(labels[0], "label"));
+                    let newLabel1 = "m" + (polizLabels.length + 1).toString();
+                    let newLabel2 = "m" + (polizLabels.length + 2).toString();
+                    let newLabel3 = "m" + (polizLabels.length + 3).toString();
+                    polizLabels.push(new PolizLabel(newLabel1, polizLabels.length + 1));
+                    polizLabels.push(new PolizLabel(newLabel2, polizLabels.length + 1));
+                    polizLabels.push(new PolizLabel(newLabel3, polizLabels.length + 1));
+                    stack.push(new PolizItem(newLabel3, "label"));
+                    stack.push(new PolizItem(newLabel2, "label"));
+                    stack.push(new PolizItem(newLabel1, "label"));
                     stack.push(inputLexemes[0]);
                     inputLexemes.splice(0,1);
                     this.isLoopNow = true;
                     this.loopEnd++;
-                    break;
+                    continue;
                 case "=":
                     if (this.isLoopNow) {
                         if (this.loopEnd === 1) {
@@ -90,18 +91,19 @@ class PolizBuilder  {
                     while (stack.last().token !== "for") {
                         poliz.push(stack.pop());
                     }
-                    const cells = [1,2,3].map((number) => {
-                        const cell = "r" + (polizLabels.length + number);
-                        polizCells.push(new PolizCell(cell, polizLabels.length + number));
-                        return cell;
-                    });
-                    poliz.push(new PolizItem(cells[0], "cell"));
+                    let newCell1 = "r" + (polizCells.length + 1).toString();
+                    let newCell2 = "r" + (polizCells.length + 2).toString();
+                    let newCell3 = "r" + (polizCells.length + 3).toString();
+                    polizCells.push(new PolizCell(newCell1, polizCells.length + 1));
+                    polizCells.push(new PolizCell(newCell2, polizCells.length + 2));
+                    polizCells.push(new PolizCell(newCell3, polizCells.length + 3));
+                    poliz.push(new PolizItem(newCell1, "cell"));
                     poliz.push(new PolizItem("1", "con"));
                     poliz.push(new PolizItem("=", "operation"));
                     poliz.push(new PolizItem(stack[stack.length - 2].token + ":", "label"));
-                    poliz.push(new PolizItem(cells[2], "cell"));
+                    poliz.push(new PolizItem(newCell3, "cell"));
                     inputLexemes.splice(0,1);
-                    break;
+                    continue;
                 case "step":
                     while (stack.last().token !== "for") {
                         poliz.push(stack.pop());
@@ -109,7 +111,7 @@ class PolizBuilder  {
                     poliz.push(new PolizItem("=", "operation"));
                     poliz.push(new PolizItem(polizCells[polizCells.length - 2].cell, "cell"));
                     inputLexemes.splice(0,1);
-                    break;
+                    continue;
                 case "do":
                     while (stack.last().token !== "for") {
                         poliz.push(stack.pop());
@@ -139,11 +141,11 @@ class PolizBuilder  {
                     poliz.push(new PolizItem(stack[stack.length - 4].token, "label"));
                     poliz.push(new PolizItem("УПХ", "operation"));
                     inputLexemes.splice(0,1);
-                    break;
+                    continue;
                 case "out": case "in":
                     stack.push(inputLexemes[0]);
                     inputLexemes.splice(0,1);
-                    break;
+                    continue;
                 case "(":
                     if (!(stack.last().token === "out" || stack.last().token === "in")) {
                         stack.push(inputLexemes[0]);
@@ -179,7 +181,7 @@ class PolizBuilder  {
                     this.ind = true;
                     stack.push(inputLexemes[0]);
                     inputLexemes.splice(0,1);
-                    break;
+                    continue;
             }
             //
             let priority1 = this.getPriority(stack.last().token);
@@ -223,6 +225,7 @@ class PolizBuilder  {
                         this.ind = false;
                     } else {
                         inputLexemes.splice(0,1);
+                        continue;
                     }
                     break;
                 case ")":
@@ -279,14 +282,17 @@ class PolizBuilder  {
                     inputLexemes.splice(0,1);
             }
         }
-        return poliz;
+        return {
+            chain: poliz, polizLabels, polizCells
+        };
     }
 
     SetPosition(poliz, polizLabels) {
-        for (let item in poliz) {
+        for (let item of poliz) {
             polizLabels.forEach((label) => {
                 if (item.type === "label" && item.token === label.label + ":") {
                     label.position = poliz.indexOf(item) + 1;
+                    console.log(label);
                 }
             });
         }
