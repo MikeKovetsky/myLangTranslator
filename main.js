@@ -335,6 +335,7 @@ function parseLexemes(sourceCode) {
     sourceCode = replaceSymbol(sourceCode, '*', ' * ');
     sourceCode = replaceSymbol(sourceCode, '(', ' ( ');
     sourceCode = replaceSymbol(sourceCode, ')', ' ) ');
+    sourceCode = replaceSymbol(sourceCode, ',', ' , ');
     for (var i = 0; i < sourceCode.length; i++) {
         var symbol = parseSymbol(sourceCode[i], sourceCode[i + 1]);
         if (lexemeEnd) {
@@ -515,14 +516,14 @@ function analyze(sourceCode) {
             case 33: type = 'con'; break;
             default: type = 'operation'; break;
         }
-        return new WorkItem(lexeme.lexemeName, type);
+        return new PolizItem(lexeme.lexemeName, type);
     });
 
-    const polizBuilder = new PolizBuilder(lexemeChain);
-    polizBuilder.build();
-    console.log(polizBuilder.poliz);
+    const polizBuilder = new PolizBuilder();
+    const poliz = polizBuilder.build(lexemeChain);
+    console.log(poliz);
     $('#poliz').empty();
-    polizBuilder.poliz.forEach(item => {
+    poliz.forEach(item => {
         $('#poliz').append(item.token + ' ');
     });
     // var mpa = new MpaAnalyzer(lexemes, langLexemes);
