@@ -3,6 +3,7 @@ Array.prototype.last = function() {
 };
 class PolizBuilder  {
     constructor() {
+        this.history = [];
         this.isLoopNow = false;
         this.loopEnd = 0;
         this.loop = "";
@@ -285,6 +286,11 @@ class PolizBuilder  {
                     stack.push(inputLexemes[0]);
                     inputLexemes.splice(0,1);
             }
+            this.history.push({
+                lexeme: inputLexemes[0],
+                stack: stack,
+                poliz: poliz,
+            });
         }
         return {
             chain: poliz, polizLabels, polizCells

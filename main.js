@@ -508,7 +508,6 @@ function analyze(sourceCode) {
     syntaxAnalyzer.analyze();
     printSyntaxErrors(syntaxAnalyzer.errors);
 
-    // 6 laba
     const lexemeChain = lexemes.map((lexeme) => {
         let type = '';
         switch (lexeme.lexemeCode) {
@@ -522,9 +521,19 @@ function analyze(sourceCode) {
     const polizBuilder = new PolizBuilder();
     const poliz = polizBuilder.build(lexemeChain);
     console.log(poliz.chain);
-    $('#poliz').empty();
+    $('#poliz-chain').empty();
     poliz.chain.forEach(item => {
-        $('#poliz').append(item.token + ' ');
+        $('#poliz-chain').append(item.token + ' ');
+    });
+    console.log(polizBuilder.history);
+    $('#poliz-history tbody').empty();
+    polizBuilder.history.forEach(historyItem => {
+        $('#poliz-history tbody').append(
+            `<tr><td>${historyItem.lexeme}</td>
+                <td>${historyItem.stack}</td>
+                <td>${historyItem.poliz}</td>
+            </tr>`
+        );
     });
 
     console.log(idns);
@@ -532,8 +541,7 @@ function analyze(sourceCode) {
         poliz.chain, poliz.polizLabels, poliz.polizCells, idns
     );
 
-    let executionResults = polizExecutor.execute();
-    console.log(executionResults);
+    polizExecutor.execute();
     $('#console').empty();
     polizExecutor.outputData.forEach(item => {
         $('#console').append(item.token + ' ' + item.value + '\n');
@@ -548,12 +556,10 @@ function analyze(sourceCode) {
 }
 
 $('#source-code').change(function () {
-    var sourceCode = $('#source-code').val();
-    analyze(sourceCode);
+    analyzeSource();
 });
 
-$(document).ready(function () {
-    var sourceCode = $('#default-value').text();
-    $('#source-code').val(sourceCode);
+function analyzeSource() {
+    const sourceCode = $('#source-code').val();
     analyze(sourceCode);
-});
+}

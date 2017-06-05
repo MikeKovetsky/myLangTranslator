@@ -3,123 +3,111 @@
 <head>
 	<meta charset="UTF-8">
 	<title>sapr</title>
-	<link rel="stylesheet" href="bootstrap.css">
-	<style>
-		#source-code {
-			width: 100%;
-			height: 320px;
-			margin-bottom: 20px;
-
-		}
-		#default-value {
-			display: none;
-		}
-	</style>
+	<link rel="stylesheet" href="libs/bootstrap.css">
+	<link rel="stylesheet" href="main.css">
 </head>
 <body>
-	<div class="container">
-		<div class="row">
-			<div class="col-sm-4">
-				<h3>Analyzer</h3>
-				<textarea class="form-control" name="" id="source-code"></textarea>
-				<div>
-					<!-- <button class="button" id="analyze">analyze</button> -->
-				</div>
-			</div>
-			<div class="col-sm-4">
-				<h3>Poliz:</h3>
-				<div id="poliz"></div>
-			</div>
-			<div class="col-sm-4">
-				<h3>Lexical Errors:</h3>
-				<div class="errors-container" id="lexical-errors"></div>
-			</div>
-			<div class="col-sm-4">
-				<h3>Syntax Errors:</h3>
-				<div id="syntaxErrors" class="errors-container"></div>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-sm-6">
-				<pre id="default-value">
-program Mishok
-	int a, i
-begin a = 2 + 3
-	for i = 1 to 3 step 1 do a = a + 1
-next
-	i = 89 + 1
-	out(i)
-	in(i)
-	out(i)
-end
-				</pre>
-			</div>
-		</div>
-		<div class="row">
+<div class="container">
+	<div class="row">
+		<h1>MyLang Анализатор</h1>
+	</div>
+	<div class="row">
+		<h3>Исходный код:
+			<button class="btn btn-success" onclick="analyzeSource()">Запуск</button>
+		</h3>
+	</div>
+	<div class="row">
+		<textarea class="form-control" id="source-code"></textarea>
+	</div>
+	<ul class="nav nav-pills">
+		<li><a class="active" href="#main" data-toggle="pill">Главная</a></li>
+		<li><a href="#lexical-analyzer" data-toggle="pill">Лексический анализатор</a></li>
+		<li><a href="#syntax-analyzer" data-toggle="pill">Синтаксический анализатор</a></li>
+		<li><a href="#poliz" data-toggle="pill">Полиз</a></li>
+	</ul>
+	<div class="tab-content">
+		<div id="main" role="tabpanel" class="tab-pane active">
 			<div class="col-sm-3">
 				<h3>Console</h3>
 				<div id="console"></div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-sm-6">
-				<h3>Lexemes</h3>
-				<table class="table lexemes-table table-striped">
-					<thead>
-						<tr>
-							<td>N</td>
-							<td>N row</td>
-							<td>GrammarLexeme</td>
-							<td>lexeme code</td>
-							<td>idn/const code</td>
-						</tr>
-					</thead>
-					<tbody class="lexemes-table-body">
-						
-					</tbody>
-				</table>
-			</div>
+		<div id="lexical-analyzer" role="tabpanel" class="tab-pane">
+			<h3>Lexemes</h3>
+			<table class="table lexemes-table table-striped">
+				<thead>
+				<tr>
+					<td>N</td>
+					<td>N row</td>
+					<td>GrammarLexeme</td>
+					<td>lexeme code</td>
+					<td>idn/const code</td>
+				</tr>
+				</thead>
+				<tbody class="lexemes-table-body">
+
+				</tbody>
+			</table>
 			<div class="col-sm-6">
 				<h3>IDNS</h3>
 				<table class="table idns-table table-striped">
-						<thead>
-						<tr>
-							<td>Code</td>
-							<td>Idn</td>
-							<td>type</td>
-						</tr>
+					<thead>
+					<tr>
+						<td>Code</td>
+						<td>Idn</td>
+						<td>type</td>
+					</tr>
 					</thead>
 					<tbody class="idns-table-body">
-						
-					</tbody>
-				</table>
-				<h3>Consts</h3>
-				<table class="table consts-table table-striped">
-						<thead>
-						<tr>
-							<td>Code</td>
-							<td>GrammarLexeme</td>
-						</tr>
-					</thead>
-					<tbody class="consts-table-body">
-						
+
 					</tbody>
 				</table>
 			</div>
+			<div class="col-sm-6">
+				<h3>Consts</h3>
+				<table class="table consts-table table-striped">
+					<thead>
+					<tr>
+						<td>Code</td>
+						<td>GrammarLexeme</td>
+					</tr>
+					</thead>
+					<tbody class="consts-table-body">
+
+					</tbody>
+				</table>
+			</div>
+			<h3>Lexical Errors:</h3>
+			<div class="errors-container" id="lexical-errors"></div>
+		</div>
+		<div id="syntax-analyzer" role="tabpanel" class="tab-pane">
+			<h3>Syntax Errors:</h3>
+			<div id="syntaxErrors" class="errors-container"></div>
+		</div>
+		<div id="poliz" role="tabpanel" class="tab-pane">
+			<h3>Poliz:</h3>
+			<div class="row">
+				<table class="table table-striped col-sm-4" id="poliz-history">
+					<thead>
+						<tr>
+							<td>Входящая лексема</td>
+							<td>Стэк</td>
+							<td>Полиз</td>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<div id="poliz-chain"></div>
+			</div>
 		</div>
 	</div>
+</div>
 </body>
-<script src="jquery.min.js"></script>
-<script src="lodash.js"></script>
-<script src="Error.js"></script>
-<script src="syntaxAnalyzer.js"></script>
-<script src="mpa-states.js"></script>
-<script src="mpa-analyzer.js"></script>
+<script src="libs/jquery.min.js"></script>
+<script src="libs/bootstrap.min.js"></script>
 
-<script src="sapr4/grammarTable.js"></script>
-<script src="sapr4/Lexeme.js"></script>
-<script src="sapr4/PrecedenceRelationshipGrammar.js"></script>
+<script src="syntaxAnalyzer/syntaxAnalyzer.js"></script>
 
 <script src="polizBuilder/PolizBuilder.js"></script>
 <script src="polizBuilder/PolizCell.js"></script>
@@ -130,9 +118,5 @@ end
 <script src="polizExecutor/Identifier.js"></script>
 <script src="polizExecutor/Executor.js"></script>
 
-<script src="risingAnalyzer/RisingAnalyzer.js"></script>
-<script src="risingAnalyzer/RisingAnalyzerItem.js"></script>
-
 <script src="main.js"></script>
-<!--<script src="sapr4/main.js"></script>-->
 </html>

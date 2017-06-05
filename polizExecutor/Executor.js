@@ -67,16 +67,13 @@ class PolizExecutor {
                     let val1 = this.GetItemValue(item2);
                     let operation = this.poliz[this.currentPosition].token;
                     let res = 0;
-                    if (operation === "+")
-                        res = val1 + val2;
-                    else if (operation === "-")
-                        res = val1 - val2;
-                    else if (operation === "*")
-                        res = val1 * val2;
-                    else if (operation === "/")
-                        res = val1 / val2;
-                    else if (operation === "^")
-                        res = Math.pow(val1, val2);
+                    switch (operation) {
+                        case "+": res = val1 + val2; break;
+                        case "-": res = val1 - val2; break;
+                        case "*": res = val1 * val2; break;
+                        case "/": res = val1 / val2; break;
+                        case "^": res = Math.pow(val1, val2); break;
+                    }
                     this.stack.push(new PolizItem(res.toString(), "con"));
                     this.currentPosition++;
                 }
@@ -88,8 +85,7 @@ class PolizExecutor {
                 this.poliz[this.currentPosition].token === "<=" ||
                 this.poliz[this.currentPosition].token === ">=" ||
                 this.poliz[this.currentPosition].token === "==" ||
-                this.poliz[this.currentPosition].token === "!=")
-            {
+                this.poliz[this.currentPosition].token === "!=") {
                 let item1 = this.stack.pop();
                 let item2 = this.stack.pop();
 
@@ -100,18 +96,14 @@ class PolizExecutor {
 
                 let res = false;
 
-                if (operation === ">")
-                    res = val1 > val2;
-                else if (operation === "<")
-                    res = val1 < val2;
-                else if (operation === "<=")
-                    res = val1 <= val2;
-                else if (operation === ">=")
-                    res = val1 >= val2;
-                else if (operation === "==")
-                    res = val1 === val2;
-                else if (operation === "!=")
-                    res = val1 !== val2;
+                switch (operation) {
+                    case ">": res = val1 > val2; break;
+                    case "<": res = val1 < val2; break;
+                    case "<=": res = val1 <= val2; break;
+                    case ">=": res = val1 >= val2; break;
+                    case "==": res = val1 === val2; break;
+                    case "!=": res = val1 !== val2; break;
+                }
                 this.stack.push(new PolizItem(res.toString(), "con"));
                 this.currentPosition++;
             }
@@ -125,12 +117,9 @@ class PolizExecutor {
                 if (item2.type === "idn") {
                     obj = this.identifiers.find(o => o.token === item2.token);
                     if (obj.type === "int") {
-                        let res = parseInt(val);
-                        obj.value = res;
-                        console.log(obj.token, res);
+                        obj.value = parseInt(val);
                     }
-                    else
-                        console.error('Invalid Operation');
+                    else console.error('Invalid Operation');
                 }
                 else if (item2.type === "cell") {
                     ob = this.polizCells.find(o => o.cell === item2.token);
@@ -189,24 +178,24 @@ class PolizExecutor {
         }
     }
 
-    GetItemValue(item) {
-        let result = 0;
-        if (item.type === "con") {
-            return parseInt(item.token);
-        } else if (item.type === "idn") {
-            let idn = this.identifiers.find(o => o.token === item.token);
-            if (idn.type === "int")
-                if (idn.value !== undefined) result = parseInt(idn.value);
-                else console.error("The identify " + idn.token + " didn't initialized at" + this.currentPosition);
-            else console.error('invalid Argument');
-        }
-        else if (item.type === "cell") {
-            for (let cell of this.polizCells){
-                if (cell.cell === item.token)
-                    result = cell.value;
+        GetItemValue(item) {
+            let result = 0;
+            if (item.type === "con") {
+                return parseInt(item.token);
+            } else if (item.type === "idn") {
+                let idn = this.identifiers.find(o => o.token === item.token);
+                if (idn.type === "int")
+                    if (idn.value !== undefined) result = parseInt(idn.value);
+                    else console.error("The identify " + idn.token + " didn't initialized at" + this.currentPosition);
+                else console.error('invalid Argument');
             }
+            else if (item.type === "cell") {
+                for (let cell of this.polizCells){
+                    if (cell.cell === item.token)
+                        result = cell.value;
+                }
+            }
+            else console.error('invalid Argument');
+            return result;
         }
-        else console.error('invalid Argument');
-        return result;
     }
-}
