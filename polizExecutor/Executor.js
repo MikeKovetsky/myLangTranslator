@@ -1,99 +1,71 @@
 class PolizExecutor {
     constructor(poliz, polizLabels, polizCells, identifyTable) {
-        this._Poliz = poliz;
-        this._PolizLabels = polizLabels;
-        this._PolizCells = polizCells;
-        this._Status = "";
-        this._Position = 0;
-        this._Stack = [];
-        this._OutParam = [];
-        this._IdentifyTable = [];
+        this.poliz = poliz;
+        this.polizLabels = polizLabels;
+        this.polizCells = polizCells;
+        this.currentPosition = 0;
+        this.stack = [];
+        this.outputData = [];
+        this.identifiers = [];
         for (let row of identifyTable) {
-            this._IdentifyTable.push(new Identifier(row.lexemeName, row.dataType, null));
+            this.identifiers.push(new Identifier(row.lexemeName, row.dataType, null));
         }
     }
 
     execute() {
-        let idnInputs = [];
-        while (this._Status !== "Successful Done") {
-            while (this._Status === "") {
-                this.GoNextStep();
-            }
-            if (this._Status.indexOf("Input") !== -1) {
-                idnInputs.push(this._Stack.last().token);
-            }
-            else if (this._Status.indexOf("Output") !== -1) {
-                let ind = this._IdentifyTable.find(o => o.token === this._Stack.last().token);
-                // this._OutParam.push(new Identifier(this._Stack.last().token, "int", ind.value));
-                this._Status = "";
-                this._Position++;
-            }
+        let isEnd = false;
+        while (!isEnd) {
+            isEnd = this.executeNextStep();
         }
-        return {idnInputs};
     }
 
-    GoNextStep() {
-        this._Status = "";
-        if (this._Position > this._Poliz.length - 1)
+    executeNextStep() {
+        if (this.currentPosition > this.poliz.length - 1) { return true;}
+
+        if (this.poliz[this.currentPosition].type === "label" &&
+            this.poliz[this.currentPosition].token[this.poliz[this.currentPosition].token.length - 1] === ':')
         {
-            this._Status = "Successful Done";
-            return;
+            this.currentPosition++;
         }
-        if (this._Poliz[this._Position].type === "label" &&
-            this._Poliz[this._Position].token[this._Poliz[this._Position].token.length - 1] === ':')
-        {
-            this._Position++;
+        else if (['idn','con','label','cell'].includes(this.poliz[this.currentPosition].type)) {
+            this.stack.push(this.poliz[this.currentPosition]);
+            this.currentPosition++;
         }
-        else if (this._Poliz[this._Position].type === "idn" ||
-            this._Poliz[this._Position].type === "con" ||
-            this._Poliz[this._Position].type === "label" ||
-            this._Poliz[this._Position].type === "cell")
-        {
-            this._Stack.push(this._Poliz[this._Position]);
-            this._Position++;
-        }
-        else if (this._Poliz[this._Position].type === "operation")
-        {
-            if (this._Poliz[this._Position].token === "RD")
-            {
-                this._Status = "Input ";
-                if (this._Stack.length > 0)
-                {
-                    let idn = this._Stack.last().token;
-                    let obj = this._IdentifyTable.find(o => o.token === idn);
+        else if (this.poliz[this.currentPosition].type === "operation") {
+            if (this.poliz[this.currentPosition].token === "RD") {
+                if (this.stack.length > 0) {
+                    let idn = this.stack.last().token;
+                    let obj = this.identifiers.find(o => o.token === idn);
                     if (obj) {
-                        this._Status += obj.type;
+                        do {
+                            obj.value = parseInt(prompt('Type in the value of ' + obj.token, '0'));
+                        } while (isNaN(obj.value));
                     }
+                    this.currentPosition++;
+                }
+            } else if (this.poliz[this.currentPosition].token === "WR") {
+                if (this.stack.length > 0) {
+                    let idn = this.stack.last().token;
+                    let obj = this.identifiers.find(o => o.token === idn);
+                    if (obj) {
+                        this.outputData.push({token: obj.token + ':', value: obj.value});
+                    }
+                    this.currentPosition++;
                 }
             }
-            else if (this._Poliz[this._Position].token === "WR")
+            else if (this.poliz[this.currentPosition].token === "+" ||
+                this.poliz[this.currentPosition].token === "/" ||
+                this.poliz[this.currentPosition].token === "*" ||
+                this.poliz[this.currentPosition].token === "-" ||
+                this.poliz[this.currentPosition].token === "^")
             {
-                this._Status = "Output ";
-                if (this._Stack.length > 0)
-                {
-                    let idn = this._Stack.last().token;
-                    let obj = this._IdentifyTable.find(o => o.token === idn);
-                    if (obj) {
-                        this._Status += obj.type;
-                        this._OutParam.push({token: obj.token + ':', value: obj.value});
-                        return;
-                    }
-                    return;
-                }
-            }
-            else if (this._Poliz[this._Position].token === "+" ||
-                this._Poliz[this._Position].token === "/" ||
-                this._Poliz[this._Position].token === "*" ||
-                this._Poliz[this._Position].token === "-" ||
-                this._Poliz[this._Position].token === "^")
-            {
-                if (this._Stack.length > 1) {
-                    let item1 = this._Stack.pop();
-                    let item2 = this._Stack.pop();
+                if (this.stack.length > 1) {
+                    let item1 = this.stack.pop();
+                    let item2 = this.stack.pop();
 
                     let val2 = this.GetItemValue(item1);
                     let val1 = this.GetItemValue(item2);
-                    let operation = this._Poliz[this._Position].token;
+                    let operation = this.poliz[this.currentPosition].token;
                     let res = 0;
                     if (operation === "+")
                         res = val1 + val2;
@@ -105,26 +77,26 @@ class PolizExecutor {
                         res = val1 / val2;
                     else if (operation === "^")
                         res = Math.pow(val1, val2);
-                    this._Stack.push(new PolizItem(res.toString(), "con"));
-                    this._Position++;
+                    this.stack.push(new PolizItem(res.toString(), "con"));
+                    this.currentPosition++;
                 }
                 else
                     console.error('Invalid operation');
             }
-            else if (this._Poliz[this._Position].token === ">" ||
-                this._Poliz[this._Position].token === "<" ||
-                this._Poliz[this._Position].token === "<=" ||
-                this._Poliz[this._Position].token === ">=" ||
-                this._Poliz[this._Position].token === "==" ||
-                this._Poliz[this._Position].token === "!=")
+            else if (this.poliz[this.currentPosition].token === ">" ||
+                this.poliz[this.currentPosition].token === "<" ||
+                this.poliz[this.currentPosition].token === "<=" ||
+                this.poliz[this.currentPosition].token === ">=" ||
+                this.poliz[this.currentPosition].token === "==" ||
+                this.poliz[this.currentPosition].token === "!=")
             {
-                let item1 = this._Stack.pop();
-                let item2 = this._Stack.pop();
+                let item1 = this.stack.pop();
+                let item2 = this.stack.pop();
 
                 let val2 = this.GetItemValue(item1);
                 let val1 = this.GetItemValue(item2);
 
-                let operation = this._Poliz[this._Position].token;
+                let operation = this.poliz[this.currentPosition].token;
 
                 let res = false;
 
@@ -140,18 +112,18 @@ class PolizExecutor {
                     res = val1 === val2;
                 else if (operation === "!=")
                     res = val1 !== val2;
-                this._Stack.push(new PolizItem(res.toString(), "con"));
-                this._Position++;
+                this.stack.push(new PolizItem(res.toString(), "con"));
+                this.currentPosition++;
             }
-            else if (this._Poliz[this._Position].token === "=")
+            else if (this.poliz[this.currentPosition].token === "=")
             {
-                let item1 = this._Stack.pop();
-                let item2 = this._Stack.pop();
+                let item1 = this.stack.pop();
+                let item2 = this.stack.pop();
                 let val = this.GetItemValue(item1);
                 let obj = new Identifier();
                 let ob = new PolizCell();
                 if (item2.type === "idn") {
-                    obj = this._IdentifyTable.find(o => o.token === item2.token);
+                    obj = this.identifiers.find(o => o.token === item2.token);
                     if (obj.type === "int") {
                         let res = parseInt(val);
                         obj.value = res;
@@ -161,77 +133,60 @@ class PolizExecutor {
                         console.error('Invalid Operation');
                 }
                 else if (item2.type === "cell") {
-                    ob = this._PolizCells.find(o => o.cell === item2.token);
+                    ob = this.polizCells.find(o => o.cell === item2.token);
                     ob.value = parseInt(val);
                 }
-                this._Position++;
+                this.currentPosition++;
             }
-            else if (this._Poliz[this._Position].token === "УПХ")
+            else if (this.poliz[this.currentPosition].token === "УПХ")
             {
-                let item1 = this._Stack.pop();
-                let item2 = this._Stack.pop();
+                let item1 = this.stack.pop();
+                let item2 = this.stack.pop();
 
                 if (item2.token === "false") {
-                    let obj = this._PolizLabels.find(o => o.label === item1.token);
-                    this._Position = obj.position;
+                    let obj = this.polizLabels.find(o => o.label === item1.token);
+                    this.currentPosition = obj.position;
                 }
                 else
-                    this._Position++;
+                    this.currentPosition++;
             }
-            else if (this._Poliz[this._Position].token === "БП") {
-                let item1 = this._Stack.pop();
-                let obj = this._PolizLabels.find(o => o.label === item1.token);
-                this._Position = obj.position;
+            else if (this.poliz[this.currentPosition].token === "БП") {
+                let item1 = this.stack.pop();
+                let obj = this.polizLabels.find(o => o.label === item1.token);
+                this.currentPosition = obj.position;
             }
-            else if (this._Poliz[this._Position].token === "and") {
-                let item1 = this._Stack.pop();
-                let item2 = this._Stack.pop();
+            else if (this.poliz[this.currentPosition].token === "and") {
+                let item1 = this.stack.pop();
+                let item2 = this.stack.pop();
                 if (item1.token === "true" && item2.token === "true")
-                    this._Stack.push(new PolizItem("true", "con"));
+                    this.stack.push(new PolizItem("true", "con"));
                 else
-                    this._Stack.push(new PolizItem("false", "con"));
+                    this.stack.push(new PolizItem("false", "con"));
 
-                this._Position++;
+                this.currentPosition++;
             }
-            else if (this._Poliz[this._Position].token === "or")
-            {
-                let item1 = this._Stack.pop();
-                let item2 = this._Stack.pop();
+            else if (this.poliz[this.currentPosition].token === "or") {
+                let item1 = this.stack.pop();
+                let item2 = this.stack.pop();
                 if (item1.token === "true" || item2.token === "true")
-                    this._Stack.push(new PolizItem("true", "con"));
+                    this.stack.push(new PolizItem("true", "con"));
                 else
-                    this._Stack.push(new PolizItem("false", "con"));
-                this._Position++;
+                    this.stack.push(new PolizItem("false", "con"));
+                this.currentPosition++;
             }
-            else if (this._Poliz[this._Position].token === "not")
-            {
-                let item1 = this._Stack.pop();
+            else if (this.poliz[this.currentPosition].token === "not") {
+                let item1 = this.stack.pop();
                 if (item1.token === "true")
-                    this._Stack.push(new PolizItem("false", "con"));
+                    this.stack.push(new PolizItem("false", "con"));
                 else if (item1.token === "false")
-                    this._Stack.push(new PolizItem("true", "con"));
+                    this.stack.push(new PolizItem("true", "con"));
                 else
                     console.error("Not can be used with logical value");
-                this._Position++;
-            }
-            else
-            {
+                this.currentPosition++;
+            } else {
                 console.error("undefined operation");
             }
         }
-    }
-    GetStack() {
-        let result = "";
-        for (let i = 0; i < this._Stack.length; i++)
-            result += this._Stack[i].token + " ";
-        return result;
-    }
-
-    GetPoliz() {
-        let result = "";
-        for (let i = 0; i < this._Poliz.length; i++)
-            result += this._Poliz[i].token + " ";
-        return result;
     }
 
     GetItemValue(item) {
@@ -239,14 +194,14 @@ class PolizExecutor {
         if (item.type === "con") {
             return parseInt(item.token);
         } else if (item.type === "idn") {
-            let idn = this._IdentifyTable.find(o => o.token === item.token);
+            let idn = this.identifiers.find(o => o.token === item.token);
             if (idn.type === "int")
                 if (idn.value !== undefined) result = parseInt(idn.value);
-                else console.error("The identify " + idn.token + " didn't initialized at" + this._Position);
+                else console.error("The identify " + idn.token + " didn't initialized at" + this.currentPosition);
             else console.error('invalid Argument');
         }
         else if (item.type === "cell") {
-            for (let cell of this._PolizCells){
+            for (let cell of this.polizCells){
                 if (cell.cell === item.token)
                     result = cell.value;
             }

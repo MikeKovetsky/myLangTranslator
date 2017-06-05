@@ -535,23 +535,9 @@ function analyze(sourceCode) {
     let executionResults = polizExecutor.execute();
     console.log(executionResults);
     $('#console').empty();
-    polizExecutor._OutParam.forEach(item => {
-        $('#console').append(item.token + ' ', item.value);
+    polizExecutor.outputData.forEach(item => {
+        $('#console').append(item.token + ' ' + item.value + '\n');
     });
-
-    // var mpa = new MpaAnalyzer(lexemes, langLexemes);
-    // mpa.analyze();
-    // printMpaLexemes(mpa);
-
-    // let grammar = new PrecedenceRelationshipGrammar(sourceGrammar);
-    // grammar.setEquality();
-    // grammar.findAllFirstPluses();
-    // grammar.findAllLastPluses();
-    // grammar.setLess();
-    // grammar.setMore1();
-    // grammar.setMore2();
-    // console.log(grammar);
-
     Array.prototype.last = function() {
         return this[this.length-1];
     };
@@ -559,19 +545,6 @@ function analyze(sourceCode) {
         return this.slice(0);
     };
 
-    // let risingAnalyzer = new RisingAnalyzer(grammar, lexemes);
-    // let risingAnalyzerTable = risingAnalyzer.analyze();
-    // console.log(risingAnalyzerTable);
-    //
-    // risingAnalyzerTable.forEach((row, index) => {
-    //     $('#risingTable tbody').append(
-    //         `<tr>
-    //             <td>${index + 1}</td>
-    //             <td>${row.getStack()}</td>
-    //             <td>${row.relationSign}</td>
-    //             <td>${row.getChain()}</td>
-    //         </tr>`)
-    // });
 }
 
 $('#source-code').change(function () {
@@ -583,4 +556,4 @@ $(document).ready(function () {
     var sourceCode = $('#default-value').text();
     $('#source-code').val(sourceCode);
     analyze(sourceCode);
-})
+});

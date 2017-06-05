@@ -49,7 +49,7 @@ class PolizBuilder  {
         while (inputLexemes.length > 0 && inputLexemes[0].token !== "begin") {
             inputLexemes.splice(0,1);
         }
-        while (inputLexemes.length) {
+        while (inputLexemes.length > 0) {
             if (['idn', 'con'].includes(inputLexemes[0].type)) {
                 poliz.push(inputLexemes[0]);
                 inputLexemes.splice(0,1);
@@ -147,17 +147,20 @@ class PolizBuilder  {
                     inputLexemes.splice(0,1);
                     continue;
                 case "(":
-                    if (!(stack.last().token === "out" || stack.last().token === "in")) {
+                    if (stack.last().token === "out" || stack.last().token === "in"){
+                        inputLexemes.splice(0,1);
+                        continue;
+                    } else {
                         stack.push(inputLexemes[0]);
+                        inputLexemes.splice(0,1);
+                        continue;
                     }
-                    inputLexemes.splice(0,1);
-                    break;
                 case ",":
                     if (stack.last().token === "out") {
-                        poliz.push(new PolizItem("RD", "operation"));
+                        poliz.push(new PolizItem("WR", "operation"));
                     }
                     if (stack.last().token === "in") {
-                        poliz.push(new PolizItem("WR", "operation"));
+                        poliz.push(new PolizItem("RD", "operation"));
                     }
                     inputLexemes.splice(0,1);
                     break;
@@ -191,7 +194,7 @@ class PolizBuilder  {
                     break;
                 if (this.loopEnd > 0 && stack.last().token === "for")
                     break;
-                if (stack.last().token === "out" || stack.last().token === "in")
+                if (stack.last().token === "out" || stack.last().token === "in") {
                     if (inputLexemes[0].token === ",") {
                         break;
                     }
@@ -201,6 +204,7 @@ class PolizBuilder  {
                             priority1 = this.getPriority(stack.last().token);
                         break;
                     }
+                }
                 if (stack.last().token === "if") {
                     break;
                 } else {
@@ -233,9 +237,9 @@ class PolizBuilder  {
                         poliz.push(stack.pop());
                     }
                     if (stack.last().token === "out"){
-                        poliz.push(new PolizItem("RD", "operation"));
-                    } else if (stack.last().token === "in") {
                         poliz.push(new PolizItem("WR", "operation"));
+                    } else if (stack.last().token === "in") {
+                        poliz.push(new PolizItem("RD", "operation"));
                     }
                     inputLexemes.splice(0,1);
                     stack.pop();
