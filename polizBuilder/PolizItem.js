@@ -3,4 +3,5 @@ class PolizItem  {
         this.token = token;
         this.type = type;
     }
+
 }

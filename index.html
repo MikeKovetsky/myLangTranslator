@@ -85,20 +85,48 @@
 			<div id="syntaxErrors" class="errors-container"></div>
 		</div>
 		<div id="poliz" role="tabpanel" class="tab-pane">
-			<h3>Poliz:</h3>
+			<h3>Сгенерированный полиз</h3>
+			<div id="poliz-chain"></div>
 			<div class="row">
-				<table class="table table-striped col-sm-4" id="poliz-history">
-					<thead>
+				<div>
+					<table class="table table-striped" id="poliz-history">
+						<thead>
 						<tr>
 							<td>Входящая лексема</td>
 							<td>Стэк</td>
 							<td>Полиз</td>
 						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-				<div id="poliz-chain"></div>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div>
+					<h3>Метки</h3>
+					<table class="table table-striped col-sm-4" id="poliz-labels">
+						<thead>
+						<tr>
+							<td>Метка</td>
+							<td>Позиция</td>
+						</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				<div>
+					<h3>Выполнение полей</h3>
+					<table class="table table-striped col-sm-4" id="poliz-execution-history">
+						<thead>
+						<tr>
+							<td>Входящая лексема</td>
+							<td>Стэк</td>
+						</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -107,13 +135,15 @@
 <script src="libs/jquery.min.js"></script>
 <script src="libs/bootstrap.min.js"></script>
 
+<script src="lexicalAnalyzer/lexicalAnalyzer.js"></script>
+
 <script src="syntaxAnalyzer/syntaxAnalyzer.js"></script>
 
 <script src="polizBuilder/PolizBuilder.js"></script>
 <script src="polizBuilder/PolizCell.js"></script>
 <script src="polizBuilder/PolizLabel.js"></script>
 <script src="polizBuilder/Priority.js"></script>
-<script src="polizBuilder/WorkItem.js"></script>
+<script src="polizBuilder/PolizItem.js"></script>
 
 <script src="polizExecutor/Identifier.js"></script>
 <script src="polizExecutor/Executor.js"></script>

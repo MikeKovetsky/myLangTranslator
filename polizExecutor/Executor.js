@@ -5,6 +5,7 @@ class PolizExecutor {
         this.polizCells = polizCells;
         this.currentPosition = 0;
         this.stack = [];
+        this.history = [];
         this.outputData = [];
         this.identifiers = [];
         for (let row of identifyTable) {
@@ -21,6 +22,12 @@ class PolizExecutor {
 
     executeNextStep() {
         if (this.currentPosition > this.poliz.length - 1) { return true;}
+
+        const stackItems = this.stack.map(item => { return item.token });
+        this.history.push({
+            lexeme: this.poliz[this.currentPosition].token,
+            stack: stackItems
+        });
 
         if (this.poliz[this.currentPosition].type === "label" &&
             this.poliz[this.currentPosition].token[this.poliz[this.currentPosition].token.length - 1] === ':')

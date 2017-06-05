@@ -51,6 +51,13 @@ class PolizBuilder  {
             inputLexemes.splice(0,1);
         }
         while (inputLexemes.length > 0) {
+            const stackTokens = stack.map(item => { return item.token });
+            const polizTokens = poliz.map(item => { return item.token });
+            this.history.push({
+                lexeme: inputLexemes[0],
+                stack: stackTokens,
+                poliz: polizTokens,
+            });
             if (['idn', 'con'].includes(inputLexemes[0].type)) {
                 poliz.push(inputLexemes[0]);
                 inputLexemes.splice(0,1);
@@ -286,11 +293,6 @@ class PolizBuilder  {
                     stack.push(inputLexemes[0]);
                     inputLexemes.splice(0,1);
             }
-            this.history.push({
-                lexeme: inputLexemes[0],
-                stack: stack,
-                poliz: poliz,
-            });
         }
         return {
             chain: poliz, polizLabels, polizCells
