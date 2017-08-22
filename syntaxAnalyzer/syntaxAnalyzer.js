@@ -75,8 +75,7 @@ function SyntaxAnalyzer(lexemes) {
         if (checkLexeme(32, 'Не идентификатор!')) {
             while (isInRange() && getLexemeCode() === 15) { //,
                 self.numLexeme++;
-                if (checkLexeme(32, 'Не идентификатор!')) {
-                }
+                checkLexeme(32, 'Не идентификатор!');
             }
             return true;
         }
